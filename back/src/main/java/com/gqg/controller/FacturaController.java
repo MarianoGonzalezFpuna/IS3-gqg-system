@@ -21,6 +21,11 @@ public class FacturaController {
         return service.obtenerTodas();
     }
 
+    @GetMapping("/siguiente-numero")
+    public Map<String, String> siguienteNumero() {
+        return Map.of("numero", service.siguienteNumero());
+    }
+
     @PostMapping
     public ResponseEntity<?> crear(@RequestBody FacturaRequest req) {
         try {

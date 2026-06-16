@@ -24,6 +24,20 @@ public class FacturaService {
         return facturaRepo.findAllByOrderByCreatedAtDesc();
     }
 
+    /**
+     * Genera el siguiente número de factura en formato 001-001-XXXXXXX
+     */
+    public String siguienteNumero() {
+        return facturaRepo.findUltimoNumero()
+                .map(ultimo -> {
+                    // Extraer el número del último bloque: "001-001-0000003" -> 3
+                    String[] partes = ultimo.split("-");
+                    long secuencia = Long.parseLong(partes[2]) + 1;
+                    return String.format("001-001-%07d", secuencia);
+                })
+                .orElse("001-001-0000001");
+    }
+
     @Transactional
     public Factura crearFactura(FacturaRequest req) {
         // 1. Validar número único

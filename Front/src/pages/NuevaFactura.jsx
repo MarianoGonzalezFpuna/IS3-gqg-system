@@ -7,6 +7,8 @@ import TablaCuotas from '../components/TablaCuotas'
 import { calcularItem, calcularTotalesFactura, generarCuotas, generarEtiquetaPlazo } from '../lib/utils'
 import { obtenerClientes, obtenerPlazos, crearFacturaCompleta } from '../lib/api'
 
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+
 export default function NuevaFactura() {
   const navigate = useNavigate()
   const [clientes, setClientes] = useState([])
@@ -39,11 +41,25 @@ export default function NuevaFactura() {
   const [guardando, setGuardando] = useState(false)
 
   useEffect(() => {
-    Promise.all([obtenerClientes(), obtenerPlazos()])
-      .then(([cli, plz]) => {
+    Promise.all([
+      obtenerClientes(),
+      obtenerPlazos(),
+      fetch(`${BASE_URL}/facturas/siguiente-numero`).then(r => r.json()),
+    ])
+      .then(([cli, plz, numData]) => {
         setClientes(cli || [])
         setPlazos(plz || [])
         if (cli?.length > 0) setHeader(p => ({ ...p, clienteId: cli[0].id }))
+        // Setear número secuencial automático
+        if (numData?.numero) {
+          const partes = numData.numero.split('-')
+          setHeader(p => ({
+            ...p,
+            factNum1: partes[0],
+            factNum2: partes[1],
+            factNum3: partes[2],
+          }))
+        }
       })
       .catch(err => toast.error('Error cargando datos: ' + err.message))
       .finally(() => setCargando(false))
@@ -189,7 +205,7 @@ export default function NuevaFactura() {
           <div className="flex gap-2">
             <button onClick={genPreview} disabled={totals.total<=0}
               className="flex-1 py-2.5 rounded-lg text-[13px] font-semibold transition-all disabled:bg-gray-100 disabled:text-gray-300 disabled:cursor-not-allowed bg-gray-200 text-gray-700 hover:bg-gray-300">
-              👁️ Vista Previa
+              🔎 Vista Previa
             </button>
             <button onClick={guardar} disabled={!showCuotas||guardando}
               className="flex-1 py-2.5 rounded-lg text-[13px] font-bold transition-all disabled:bg-gray-100 disabled:text-gray-300 disabled:cursor-not-allowed bg-brand hover:bg-brand-dark text-white">
