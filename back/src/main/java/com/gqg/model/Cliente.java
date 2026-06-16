@@ -1,5 +1,6 @@
 package com.gqg.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ public class Cliente {
     @Column(nullable = false, length = 150)
     private String nombre;
 
+    @JsonProperty("ruc_ci")
     @Column(name = "ruc_ci", length = 20)
     private String rucCi;
 

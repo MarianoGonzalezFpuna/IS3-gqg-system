@@ -1,5 +1,6 @@
 package com.gqg.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonProperty("cod_barra")
     @Column(name = "cod_barra", unique = true, length = 20)
     private String codBarra;
 

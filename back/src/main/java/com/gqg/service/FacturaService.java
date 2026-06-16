@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +38,7 @@ public class FacturaService {
         // 3. Obtener plazo (si aplica)
         Plazo plazo = null;
         if (req.getPlazoId() != null) {
-            plazo = plazoRepo.findById(req.getPlazoId())
-                    .orElse(null);
+            plazo = plazoRepo.findById(req.getPlazoId()).orElse(null);
         }
 
         // 4. Armar la factura
@@ -82,79 +80,8 @@ public class FacturaService {
         }
         factura.setDetalles(detalles);
 
-        // 6. Guardar factura (JPA guarda detalles en cascada)
-        Factura guardada = facturaRepo.save(factura);
-
-        // 7. Generar cuotas en Java (replica la lógica del trigger SQL)
-        List<Cuenta> cuotas = generarCuotas(guardada, plazo);
-        guardada.setCuentas(cuotas);
-        return facturaRepo.save(guardada);
-    }
-
-    /**
-     * Genera las cuotas de la factura según la modalidad y el plazo.
-     * Replica la lógica del trigger fn_generar_cuotas() de PostgreSQL.
-     */
-    private List<Cuenta> generarCuotas(Factura factura, Plazo plazo) {
-        List<Cuenta> cuotas = new ArrayList<>();
-        String tipoCuenta = "venta".equals(factura.getTipo()) ? "cobrar" : "pagar";
-        BigDecimal total = factura.getTotal();
-        LocalDate fechaFactura = factura.getFecha();
-
-        if ("CO".equals(factura.getModalidad())) {
-            // Contado: una sola cuota que vence hoy
-            Cuenta c = new Cuenta();
-            c.setFactura(factura);
-            c.setTipo(tipoCuenta);
-            c.setCuota("1/1");
-            c.setImporte(total);
-            c.setVence(fechaFactura);
-            c.setCobrado(BigDecimal.ZERO);
-            c.setEstado("pendiente");
-            cuotas.add(c);
-            return cuotas;
-        }
-
-        // Crédito: distribuir en N cuotas
-        int cantCuotas = plazo.getCuotas();
-        BigDecimal importePorCuota = total.divide(
-                BigDecimal.valueOf(cantCuotas), 0, RoundingMode.FLOOR);
-        BigDecimal resto = total.subtract(importePorCuota.multiply(BigDecimal.valueOf(cantCuotas)));
-
-        List<PlazoDetalle> detallesPlazo = plazo.getPlazoDetalles();
-
-        for (int i = 1; i <= cantCuotas; i++) {
-            final int numeroCuota = i; // necesario para usar en lambda
-            LocalDate vence;
-
-            if (Boolean.TRUE.equals(plazo.getIrregular()) && detallesPlazo != null) {
-                // Irregular: sumar días específicos
-                int dias = detallesPlazo.stream()
-                        .filter(d -> d.getCuota() == numeroCuota)
-                        .findFirst()
-                        .map(PlazoDetalle::getDias)
-                        .orElse(numeroCuota * 30);
-                vence = fechaFactura.plusDays(dias);
-            } else {
-                // Regular: cada 30 días
-                vence = fechaFactura.plusDays((long) i * 30);
-            }
-
-            BigDecimal importe = (i == cantCuotas)
-                    ? importePorCuota.add(resto)
-                    : importePorCuota;
-
-            Cuenta c = new Cuenta();
-            c.setFactura(factura);
-            c.setTipo(tipoCuenta);
-            c.setCuota(i + "/" + cantCuotas);
-            c.setImporte(importe);
-            c.setVence(vence);
-            c.setCobrado(BigDecimal.ZERO);
-            c.setEstado("pendiente");
-            cuotas.add(c);
-        }
-
-        return cuotas;
+        // 6. Guardar factura + detalles
+        // El trigger fn_generar_cuotas() en PostgreSQL genera las cuotas automáticamente
+        return facturaRepo.save(factura);
     }
 }
