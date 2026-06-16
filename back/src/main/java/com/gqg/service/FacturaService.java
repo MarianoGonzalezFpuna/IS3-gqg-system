@@ -124,15 +124,16 @@ public class FacturaService {
         List<PlazoDetalle> detallesPlazo = plazo.getPlazoDetalles();
 
         for (int i = 1; i <= cantCuotas; i++) {
+            final int numeroCuota = i; // necesario para usar en lambda
             LocalDate vence;
 
             if (Boolean.TRUE.equals(plazo.getIrregular()) && detallesPlazo != null) {
                 // Irregular: sumar días específicos
                 int dias = detallesPlazo.stream()
-                        .filter(d -> d.getCuota() == i)
+                        .filter(d -> d.getCuota() == numeroCuota)
                         .findFirst()
                         .map(PlazoDetalle::getDias)
-                        .orElse(i * 30);
+                        .orElse(numeroCuota * 30);
                 vence = fechaFactura.plusDays(dias);
             } else {
                 // Regular: cada 30 días
