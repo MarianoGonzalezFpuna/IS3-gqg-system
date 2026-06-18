@@ -7,6 +7,7 @@ import Productos from './pages/Productos'
 import Plazos from './pages/Plazos'
 import NuevaFactura from './pages/NuevaFactura'
 import Historial from './pages/Historial'
+import ConsultaFacturas from './pages/ConsultaFacturas'
 
 function Inicio() {
   return (
@@ -52,6 +53,7 @@ export default function App() {
             <Route path="/clientes" element={<Clientes />} />
             <Route path="/productos" element={<Productos />} />
             <Route path="/facturas" element={<NuevaFactura />} />
+            <Route path="/consulta-facturas" element={<ConsultaFacturas />} />
             <Route path="/historial" element={<Historial />} />
             <Route path="/plazos" element={<Plazos />} />
           </Routes>

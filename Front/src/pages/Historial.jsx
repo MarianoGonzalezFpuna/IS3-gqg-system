@@ -50,7 +50,7 @@ export default function Historial() {
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-brand font-bold text-base">📋 Facturas ({facturas.length}) <span className="text-xs text-gray-400 font-normal ml-1">— {fuente==='api'?'desde API Java':'desde local'}</span></h2>
+        <h2 className="text-brand font-bold text-base">💰 Cuentas a Cobrar ({facturas.length})</h2>
         {fuente==='local' && <button onClick={limpiar} className="px-3 py-1.5 text-xs text-red-500 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 transition-colors">🗑️ Limpiar local</button>}
       </div>
       <div className="space-y-3">

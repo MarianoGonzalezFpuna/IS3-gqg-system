@@ -20,8 +20,8 @@ export default function NuevaFactura() {
     fechaProceso: new Date().toISOString().slice(0, 16),
     fechaFactura: new Date().toISOString().split('T')[0],
     timbrado: '17155531',
-    vigenciaDesde: '2026-04-11',
-    vigenciaHasta: '2027-04-30',
+    vigenciaDesde: '2024-04-11',
+    vigenciaHasta: '2025-04-30',
     rucEmpresa: '384649-0',
     factNum1: '001', factNum2: '001', factNum3: '0000001',
     clienteId: '',
@@ -82,7 +82,13 @@ export default function NuevaFactura() {
   const handleModalidad = (mod) => {
     setModalidad(mod)
     setHeader(p => ({ ...p, tipoDoc: mod==='CO' ? 'Factura Contado' : 'Factura Crédito' }))
-    if (mod==='CO') setPlazoSeleccionado(plazos.find(p => p.tipoId===0 || p.tipo_id===0) || null)
+    // Al cambiar modalidad, resetear plazo según corresponda
+    if (mod === 'CO') {
+      setPlazoSeleccionado(plazos.find(p => p.tipoId===0 || p.tipo_id===0) || null)
+    } else {
+      // Al cambiar a crédito, limpiar el plazo para que el usuario elija uno
+      setPlazoSeleccionado(null)
+    }
     setShowCuotas(false)
   }
 
@@ -154,7 +160,7 @@ export default function NuevaFactura() {
       await crearFacturaCompleta(cabecera, detalles)
       toast.success('✅ Factura guardada')
       setItems([]); setShowCuotas(false); setCuotasPreview([])
-      navigate('/historial')
+      navigate('/consulta-facturas')
     } catch (err) {
       toast.error('Error: ' + err.message)
     } finally {
@@ -205,7 +211,7 @@ export default function NuevaFactura() {
           <div className="flex gap-2">
             <button onClick={genPreview} disabled={totals.total<=0}
               className="flex-1 py-2.5 rounded-lg text-[13px] font-semibold transition-all disabled:bg-gray-100 disabled:text-gray-300 disabled:cursor-not-allowed bg-gray-200 text-gray-700 hover:bg-gray-300">
-              🔎 Vista Previa
+              👁️ Vista Previa
             </button>
             <button onClick={guardar} disabled={!showCuotas||guardando}
               className="flex-1 py-2.5 rounded-lg text-[13px] font-bold transition-all disabled:bg-gray-100 disabled:text-gray-300 disabled:cursor-not-allowed bg-brand hover:bg-brand-dark text-white">
