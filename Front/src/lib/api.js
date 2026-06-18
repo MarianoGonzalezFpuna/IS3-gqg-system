@@ -15,8 +15,11 @@ async function http(path, options = {}) {
     const err = await res.json().catch(() => ({ error: res.statusText }))
     throw new Error(err.error || `Error ${res.status}`)
   }
+  // Manejar respuestas sin body (204 No Content o 200 vacío)
   if (res.status === 204) return null
-  return res.json()
+  const text = await res.text()
+  if (!text) return null
+  return JSON.parse(text)
 }
 
 // ── Clientes ──

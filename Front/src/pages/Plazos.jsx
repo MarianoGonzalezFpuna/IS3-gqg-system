@@ -66,6 +66,16 @@ export default function Plazos() {
 
   const guardar = async () => {
     if (!form.plazo.trim()) { toast.error('El nombre no puede estar vacío'); return }
+
+    // Validar que no exista ya un plazo Contado (solo puede haber uno)
+    if (form.tipo_id === 0 && !editId) {
+      const yaExisteContado = plazos.some(p => (p.tipoId ?? p.tipo_id) === 0)
+      if (yaExisteContado) {
+        toast.error('Ya existe un plazo Contado. Solo puede haber uno.')
+        return
+      }
+    }
+
     setGuardando(true)
     try {
       const plazoData = { plazo:form.plazo, tipoId:form.tipo_id, cuotas:form.cuotas, irregular:form.irregular }
