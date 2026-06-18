@@ -92,8 +92,8 @@ export default function CabeceraFactura({ header, setHeader, totals, clientes = 
           <p className="text-[11px] text-gray-500 font-semibold mb-1.5">FACTURA Nº</p>
           <div className="flex gap-1 justify-center">
             {['factNum1','factNum2','factNum3'].map((k, i) => (
-              <input key={k} value={header[k]} onChange={e => update(k, e.target.value)}
-                className={`${INPUT} text-center font-bold text-sm ${i===2?'w-[90px]':'w-[50px]'}`} />
+              <input key={k} value={header[k]} readOnly
+                className={`${INPUT_RO} text-center font-bold text-sm ${i===2?'w-[90px]':'w-[50px]'}`} />
             ))}
           </div>
         </div>

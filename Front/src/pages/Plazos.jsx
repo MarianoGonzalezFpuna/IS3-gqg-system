@@ -76,6 +76,18 @@ export default function Plazos() {
       }
     }
 
+    // Validar que no exista un plazo crédito con el mismo nombre
+    if (form.tipo_id === 1 && !editId) {
+      const yaExiste = plazos.some(p =>
+        (p.tipoId ?? p.tipo_id) === 1 &&
+        p.plazo.trim().toLowerCase() === form.plazo.trim().toLowerCase()
+      )
+      if (yaExiste) {
+        toast.error(`Ya existe un plazo crédito con el nombre "${form.plazo}".`)
+        return
+      }
+    }
+
     setGuardando(true)
     try {
       const plazoData = { plazo:form.plazo, tipoId:form.tipo_id, cuotas:form.cuotas, irregular:form.irregular }
