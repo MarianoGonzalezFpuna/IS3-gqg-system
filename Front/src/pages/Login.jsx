@@ -52,7 +52,6 @@ export default function Login({ onLogin }) {
             Sign In
           </button>
         </form>
-        <p className="text-xs text-gray-400 text-center mt-4">Contraseña: 12345</p>
       </div>
     </div>
   )
